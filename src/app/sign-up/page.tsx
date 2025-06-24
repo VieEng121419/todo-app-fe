@@ -17,6 +17,13 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const FormSchema = z.object({
+  username: z
+    .string({
+      required_error: "Username is required.",
+    })
+    .min(3, {
+      message: "Username must be at least 3 characters.",
+    }),
   email: z
     .string({
       required_error: "Email is required.",
@@ -27,10 +34,11 @@ const FormSchema = z.object({
   }),
 });
 
-const SignInPage = () => {
+const SignUpPage = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
+      username: "",
       email: "",
       password: "",
     },
@@ -47,16 +55,33 @@ const SignInPage = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center relative">
-      <div className="w-full max-w-md space-y-6">
-        <h1 className="text-3xl font-bold text-center absolute top-35 transform left-1/2 -translate-x-1/2 w-full">
-          Login to your <span className="text-primary">Account</span>
+    <div className="flex flex-col min-h-screen items-center justify-center relative" style={{ backgroundColor: '#F6F6F6' }}>
+      <div className="w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center mb-10">
+          Create new <span className="text-primary">Account</span>
         </h1>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="grid w-full max-w-md gap-6"
           >
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter your username"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
@@ -92,18 +117,18 @@ const SignInPage = () => {
               )}
             />
             <Button type="submit" className="w-full">
-              Sign In
+              Sign Up
             </Button>
           </form>
         </Form>
 
-        <div className="relative">
+        <div className="relative mt-10">
           <div className="relative flex justify-center text-xs font-semibold">
-            <span className="px-2 text-gray-500">OR LOGIN WITH:</span>
+            <span className="px-2 text-gray-500">OR SIGN UP WITH:</span>
           </div>
         </div>
 
-        <div className="flex justify-center space-x-4">
+        <div className="flex justify-center space-x-4 mt-4">
           <Button
             variant="outline"
             size="icon"
@@ -147,9 +172,9 @@ const SignInPage = () => {
       </div>
       <div className="flex justify-center space-x-4 absolute bottom-12">
         <h3 className="text-sm font-semibold text-gray-500">
-          Don't have an account?{" "}
-          <a href="/sign-up" className="text-primary hover:underline">
-            Sign Up
+          Already have an account?{" "}
+          <a href="/sign-in" className="text-primary hover:underline">
+            Sign In
           </a>
         </h3>
       </div>
@@ -157,4 +182,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default SignUpPage;
