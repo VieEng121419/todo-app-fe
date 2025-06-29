@@ -2,7 +2,7 @@ import api from "@/lib/api";
 
 export const getTodos = async () => {
   try {
-    const response = await api.get("/todo");
+    const response = await api.get("api/todo");
     if (!response || !response.data) {
       throw new Error("No data received from the server");
     }
