@@ -5,9 +5,11 @@ import localFont from "next/font/local";
 
 import { ThemeProvider } from "next-themes";
 
-import NavigationBar from "@/app/(delete-this-and-modify-page.tsx)/NavigationBar";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import "@/app/globals.css";
 import { Toaster } from "@/registry/new-york-v4/ui/sonner";
+import Providers from "./provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,20 +29,20 @@ export const metadata: Metadata = {
 
 const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
   return (
-    // ? https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
-    // ? https://react.dev/reference/react-dom/client/hydrateRoot#suppressing-unavoidable-hydration-mismatch-errors
     <html suppressHydrationWarning lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} bg-[#F6F6F6] text-foreground overscroll-none antialiased`}
-        
       >
-        <ThemeProvider attribute="class">
-          {/* <NavigationBar /> */}
-          <main className="container mx-auto px-4 py-6 md:px-6 lg:px-8">
-            {children}
-          </main>
-          <Toaster />
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider attribute="class">
+            {/* <NavigationBar /> */}
+            <main className="container mx-auto px-4 py-6 md:px-6 lg:px-8">
+              {children}
+            </main>
+            <Toaster />
+          </ThemeProvider>
+        </Providers>
+        {/* <MenuBottom /> */}
       </body>
     </html>
   );

@@ -6,60 +6,37 @@ import LayoutWithMenu from "@/components/layout-with-menu";
 import { Button } from "@/registry/new-york-v4/ui/button";
 import { Progress } from "@/registry/new-york-v4/ui/progress";
 import { PlusCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import TodoCard from "@/components/todo-card";
-import Image from "next/image";
+import TodoCardSkeleton from "@/components/todo-card-skeleton";
+import useTodosHook from "@/hooks/useTodosHook";
 
-// Sample todo data
-const initialTodos = [
-  {
-    id: "1",
-    title: "Exercise",
-    description: "Carry out a yoga session",
-    date: "10:30 PM 19 Feb, 2025",
-    completed: false,
-  },
-  {
-    id: "2",
-    title: "Meeting with team",
-    description: "Discuss project progress and next steps",
-    date: "2:00 PM 25 Jun, 2025",
-    completed: false,
-  },
-  {
-    id: "3",
-    title: "Grocery shopping",
-    description: "Buy fruits, vegetables, and other essentials",
-    date: "11:00 AM 26 Jun, 2025",
-    completed: false,
-  },
-  {
-    id: "4",
-    title: "Read a book",
-    description: "Continue reading 'The Psychology of Money'",
-    date: "8:00 PM Today",
-    completed: true,
-  },
-];
+interface Todo {
+  _id: string;
+  title: string;
+  description: string;
+  date: string;
+  completed: boolean;
+}
 
 const TodosPage = () => {
-  const [todos, setTodos] = useState(initialTodos);
+  const { data: todosData, isLoading } = useTodosHook();
+  console.log("🚀 ~ TodosPage ~ todosData:", todosData);
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [currentTodo, setCurrentTodo] = useState<
-    (typeof initialTodos)[0] | null
-  >(null);
+  const [currentTodo, setCurrentTodo] = useState<Todo | null>(null);
 
   const handleToggleComplete = (id: string, checked: boolean) => {
     setTodos(
       todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: checked } : todo
+        todo._id === id ? { ...todo, completed: checked } : todo
       )
     );
   };
 
   const handleEdit = (id: string) => {
-    const todoToEdit = todos.find((todo) => todo.id === id);
+    const todoToEdit = todos.find((todo) => todo._id === id);
     if (todoToEdit) {
       setCurrentTodo(todoToEdit);
       setIsEditModalOpen(true);
@@ -67,17 +44,23 @@ const TodosPage = () => {
   };
 
   const handleSaveTodo = (updatedTodo: {
-    id: string;
+    _id: string;
     title: string;
     description: string;
     date: string;
   }) => {
     setTodos(
       todos.map((todo) =>
-        todo.id === updatedTodo.id ? { ...todo, ...updatedTodo } : todo
+        todo._id === updatedTodo._id ? { ...todo, ...updatedTodo } : todo
       )
     );
   };
+
+  useEffect(() => {
+    if (todosData?.length > 0) {
+      setTodos(todosData);
+    }
+  }, [todosData]);
 
   return (
     <LayoutWithMenu>
@@ -130,25 +113,34 @@ const TodosPage = () => {
         )}
 
         <div className="space-y-4">
-          {todos.map((todo) => (
-            <TodoCard
-              key={todo.id}
-              id={todo.id}
-              title={todo.title}
-              description={todo.description}
-              date={todo.date}
-              completed={todo.completed}
-              onToggle={(checked) => handleToggleComplete(todo.id, checked)}
-              onEdit={() => handleEdit(todo.id)}
-            />
-          ))}
+          {isLoading ? (
+            // Show skeleton cards while loading
+            Array.from({ length: 3 }).map((_, index) => (
+              <TodoCardSkeleton key={index} />
+            ))
+          ) : (
+            <>
+              {todos.map((todo) => (
+                <TodoCard
+                  key={todo._id}
+                  id={todo._id}
+                  title={todo.title}
+                  description={todo.description}
+                  date={todo.date}
+                  completed={todo.completed}
+                  onToggle={(checked) => handleToggleComplete(todo._id, checked)}
+                  onEdit={() => handleEdit(todo._id)}
+                />
+              ))}
 
-          {todos.length === 0 && (
-            <div className="text-center py-10">
-              <p className="text-gray-500">
-                No todos yet. Add one to get started!
-              </p>
-            </div>
+              {todos.length === 0 && (
+                <div className="text-center py-10">
+                  <p className="text-gray-500">
+                    No todos yet. Add one to get started!
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

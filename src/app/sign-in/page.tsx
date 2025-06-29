@@ -1,5 +1,6 @@
 "use client";
 
+import { useLogin } from "@/hooks/useLogin";
 import { Button } from "@/registry/new-york-v4/ui/button";
 import {
   Form,
@@ -11,6 +12,8 @@ import {
 } from "@/registry/new-york-v4/ui/form";
 import { Input } from "@/registry/new-york-v4/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -28,6 +31,8 @@ const FormSchema = z.object({
 });
 
 const SignInPage = () => {
+  const router = useRouter(); // Assuming useRouter is imported from 'next/router'
+  const { mutate: loginUser, isPending } = useLogin(); // Assuming useLogin is defined elsewhere
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -37,12 +42,14 @@ const SignInPage = () => {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast("You submitted the following values:", {
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+    loginUser(data, {
+      onSuccess: () => {
+        toast.success("Login successful!");
+        router.push("/todos")
+      },
+      onError: (error) => {
+        toast.error(error.message || "Login failed. Please try again.");
+      },
     });
   }
 
@@ -92,6 +99,7 @@ const SignInPage = () => {
               )}
             />
             <Button type="submit" className="w-full">
+              {isPending && <Loader2Icon className="animate-spin" />}
               Sign In
             </Button>
           </form>

@@ -19,13 +19,13 @@ interface EditTodoModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedTodo: {
-    id: string;
+    _id: string;
     title: string;
     description: string;
     date: string;
   }) => void;
   todo: {
-    id: string;
+    _id: string;
     title: string;
     description: string;
     date: string;
@@ -52,17 +52,17 @@ const EditTodoModal = ({
   }, [todo]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (todo) {
-      onSave({
-        id: todo.id,
-        title,
-        description,
-        // Format the date back to a readable format for display
-        date: formatDate(new Date(date), "long"),
-      });
-    }
-    onClose();
+    // e.preventDefault();
+    // if (todo) {
+    //   onSave({
+    //     _id: todo._id,
+    //     title,
+    //     description,
+    //     // Format the date back to a readable format for display
+    //     date: formatDate(new Date(date), "long"),
+    //   });
+    // }
+    // onClose();
   };
 
   return (
